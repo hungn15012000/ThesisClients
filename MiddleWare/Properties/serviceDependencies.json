@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "type": "mssql",
+<<<<<<< Updated upstream
+      "connectionId": "DefaultConnection"
+=======
+      "connectionId": "ConnectionStrings:MiddlewareDbConnection"
+    },
+    "mssql3": {
+      "type": "mssql",
+      "connectionId": "DbConnection",
+      "dynamicId": null
+    },
+    "secrets1": {
+      "type": "secrets",
+      "connectionId": null
+    },
+    "mssql4": {
+      "type": "mssql",
+      "connectionId": "DbConnectionString"
+>>>>>>> Stashed changes
+    }
+  }
+}
