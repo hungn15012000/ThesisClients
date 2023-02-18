@@ -1,0 +1,124 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = Middleware.Server.Blazor
+build_property.RootNamespace = Middleware.Server.Blazor
+build_property.ProjectDir = E:\Thesis\MiddleWare\Middleware.Server.Blazor\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = E:\Thesis\MiddleWare\Middleware.Server.Blazor
+build_property._RazorSourceGeneratorDebug = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Customers/Create.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJzXENyZWF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Customers/Details.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJzXERldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Customers/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJzXEluZGV4LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Customers/Update.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJzXFVwZGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/NodeManager/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm9kZU1hbmFnZXJcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Popup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9wdXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Products/Create.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcQ3JlYXRlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Products/Details.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcRGV0YWlscy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Products/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Products/Update.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdHNcVXBkYXRlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Scada/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NhZGFcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Settings/Connect.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0dGluZ3NcQ29ubmVjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Settings/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2V0dGluZ3NcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Users/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlcnNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Users/Logout.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlcnNcTG9nb3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Users/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlcnNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Shared/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFJlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-cqdnzz3zmr
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-himgbjrhb9
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Thesis/MiddleWare/Middleware.Server.Blazor/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

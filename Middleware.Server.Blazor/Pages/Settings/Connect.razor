@@ -1,0 +1,269 @@
+﻿@page "/settings/connect/{id:int}"
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Reflection
+
+@inject INodeService nodeService
+@inject IConnectionService nodeService
+@inject NavigationManager Navigation
+@inject IJSRuntime jsruntime
+
+<h3>Connecting Settings</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }    
+</style>
+@if(id == 0)
+{
+    <table class="table table-dark table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Security Mode</th>
+                <th scope="col">Security Policy Uri</th>
+                <th scope="col">Sign & Encrypted</th>
+                <th scope="col">Handle</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#None</td>
+                <th> No</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#None")
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>2</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15</td>
+                <th> No</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15")
+                    {
+                        @if (securityMode == 2)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>2</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Basic256</td>
+                <th> No</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Basic256")
+                    {
+                        @if (securityMode == 2)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>2</th>
+
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256</td>
+                <th> No</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256")
+                    {
+                        @if (securityMode == 2)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>2</th>
+
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep</td>
+                <th> No</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep")
+                    {
+                        @if (securityMode == 2)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15</td>
+                <th> Yes</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15")
+                    {
+                        @if (securityMode == 3)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Basic256</td>
+                <th> Yes</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Basic256")
+                    {
+                        @if (securityMode == 3)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256</td>
+                <th> Yes</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256")
+                    {
+                        @if (securityMode == 3)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td>http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep</td>
+                <th> Yes</th>
+                <td>
+                    @if (SecurityPolicyUri == "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep")
+                    {
+                        @if (securityMode == 3)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        }
+                    }
+                    else
+                    {
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    }
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <button type="button" @onclick="BackToList" class="btn btn-success">Done</button>
+}
+else 
+{
+    <div class="alert alert-warning" role="alert">
+        There is nothing on this Server.
+    </div>
+}
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private OpcUaConnectionUrl Endpoint = new OpcUaConnectionUrl();
+    private List<OpcUaConnectionUrl> results = new List<OpcUaConnectionUrl>();
+    private List<SecurityModel> model = new List<SecurityModel>();
+    private Response<List<OpcUaConnectionUrl>> response = new Response<List<OpcUaConnectionUrl>> { Success = true };
+    private object returnObject;
+    private long securityMode;
+    private string SecurityPolicyUri;
+    protected async override Task OnInitializedAsync()
+    {
+
+        var AllResponse = await nodeService.GetDataSet();
+        if (AllResponse.Success)
+        {
+            results = AllResponse.Data;
+        }
+        var ServerResponse = await nodeService.GetEndpoints(results[0].Url);
+        if (ServerResponse.Success)
+        {
+            returnObject = ServerResponse.Data;
+            dynamic dy = returnObject;
+            SecurityPolicyUri = dy[3]["securityPolicyUri"].Value;           //var newobject = JsonConvert.SerializeObject(returnObject);
+            securityMode = dy[3]["securityMode"].Value;
+            var a = "123";
+        }
+    }
+    private async Task BackToList()
+    {
+        var confirm = await jsruntime.InvokeAsync<bool>("confirm", $"Are you sure want to connect ?");
+        Navigation.NavigateTo("/customers/");
+    }
+}

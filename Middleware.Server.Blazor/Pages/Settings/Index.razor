@@ -1,0 +1,86 @@
+﻿@page "/settings/"
+
+@inject IConnectionService nodeService
+@inject NavigationManager Navigation
+@inject IJSRuntime jsruntime
+
+
+<PageTitle>Settings</PageTitle>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }    
+</style>
+<button @onclick="DataSet" class="btn btn-outline-warning">
+    <span class="oi oi-account-login"></span>Get Servers
+</button>
+
+   
+<table class="table table-dark table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">URL</th>
+            <th scope="col">Handle</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var result in results)
+        {
+            <tr>
+                <td>@result.Id</td>
+                <td>@result.Name</td>
+                <td>@result.Url</td>
+                <td>
+                    <AuthorizeView Roles="Administrator">
+                        <a class="btn btn-danger" href="/settings/connect/@result.Id"><span class="oi oi-play-circle" aria-hidden="true"></span>CONNECT</a>
+                    </AuthorizeView>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    private HubConnection? hubConnection;
+    private List<string> messages = new List<string>();
+    private string? userInput;
+    private string? messageInput;
+    private string? NodeId;
+    private const string? falseInput = "false";
+    private const string? trueInput = "true";
+    private List<OpcUaConnectionUrl> results = new List<OpcUaConnectionUrl>();
+    private Response<List<OpcUaConnectionUrl>> response = new Response<List<OpcUaConnectionUrl>> { Success = true };
+
+    public Index()
+    {
+    }
+
+    [Inject]
+    public IActuatorHttpRepository Repo { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+      
+    }
+    
+    private async Task DataSet()
+    {
+        var nodeResponse = await nodeService.GetDataSet();
+        if (nodeResponse.Success)
+        {
+            results = nodeResponse.Data;
+        }
+    }
+
+ 
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/products/");
+    }
+}

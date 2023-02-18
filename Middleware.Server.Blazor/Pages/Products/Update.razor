@@ -1,0 +1,140 @@
+﻿@page "/products/update/{id:int}"
+@inject IProductService productService
+@inject ICustomerService customerService
+@inject NavigationManager navManager
+@attribute [Authorize(Roles = Roles.Administrator)]
+<h3>Update product information</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }    
+</style>
+<EditForm Model="product" OnValidSubmit="HandleUpdateProduct">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="productName">Product Name</label>
+        <InputText @bind-Value="product.ProductName" class="form-control" id="firstname" />
+        <ValidationMessage For="@(() =>product.ProductName)" />
+    </div>
+
+    <div class="form-group">
+        <label for="productSerialNumber">Product Serial Number</label>
+        <InputText @bind-Value="product.ProductSerialNumber" class="form-control" id="lastname" />
+        <ValidationMessage For="@(() =>product.ProductSerialNumber)" />
+    </div>
+
+    <div class="form-group">
+        <label for="productInvoice">Product Invoice</label>
+        <InputText @bind-Value="product.ProductInvoice" class="form-control" id="invoice" />
+        <ValidationMessage For="@(() =>product.ProductInvoice)" />
+    </div>
+
+    <div class="form-group">
+        <label for="productInvoice">Order Date</label>
+        <InputDate @bind-Value="product.OrderDate" class="form-control" id="orderdate" />
+        <ValidationMessage For="@(() =>product.OrderDate)" />
+    </div>
+
+    <div class="form-group">
+        <label for="productQuantity">Product Quantity</label>
+        <InputNumber @bind-Value="product.Quantity" class="form-control" id="productquantity" />
+        <ValidationMessage For="@(() =>product.Quantity)" />
+    </div>
+
+    <div class="form-group">
+        <label for="customerId">customerId</label>
+        <InputSelect @bind-Value="product.CustomerId" class="form-control" id="customerid">
+            <option value="">-- Select Customer --</option>
+            @foreach (var customer in customers)
+            {
+                <option value="@customer.Id"> @customer.Firstname @customer.Lastname</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label>Product Investigation form</label>
+        <div>
+            <InputFile OnChange="HandleFileSelection" />
+            <img src="@img" width="300" height="300" class="img-thumbnail">
+            <p class="text-danger">@UploadFileWarning</p>
+
+        </div>
+    </div>
+
+
+
+    <button type="submit" class="btn btn-primary">
+        <span class="oi oi-pencil"></span>Update Product
+    </button>
+    <button @onclick="BackToList" class="btn btn-secondary">
+        <span class="oi oi-media-skip-backward"></span>Back To List
+    </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private ProductUpdateDto product = new ProductUpdateDto();
+    private List<CustomerReadDto> customers = new List<CustomerReadDto>();
+    private string UploadFileWarning = string.Empty;
+    private string img = string.Empty;
+    protected async override Task OnInitializedAsync()
+    {
+        var responseCustomer = await customerService.GetCustomers();
+        if (responseCustomer.Success)
+        {
+            customers = responseCustomer.Data;
+        }
+        var responseProduct = await productService.GetForUpdateProduct(id);
+        if (responseProduct.Success)
+        {
+            product = responseProduct.Data;
+            img = product.Remark;
+        }
+    }
+    private async Task HandleUpdateProduct()
+    {
+        var response = await productService.EditProduct(id, product);
+        if (response.Success)
+        {
+            BackToList();
+        }
+    }
+    private void BackToList()
+    {
+        navManager.NavigateTo("/products/");
+    }
+    private async Task HandleFileSelection(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (file != null)
+        {
+            var ext = System.IO.Path.GetExtension(file.Name);
+            if (ext.ToLower().Contains(".docx")
+            || ext.ToLower().Contains(".doc")
+            || ext.ToLower().Contains(".pdf")
+            || ext.ToLower().Contains(".jpg")
+            || ext.ToLower().Contains(".png")
+            || ext.ToLower().Contains(".jpeg")
+            || ext.ToLower().Contains(".xlsx"))
+            {
+                var byteArray = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(byteArray);
+                string imageType = file.ContentType;
+                string base64string = Convert.ToBase64String(byteArray);
+                product.Remark = base64string;
+                product.RemarkOriginal = file.Name;
+                img = $"data:{imageType}; base64, {base64string}";
+            }
+            else
+            {
+                UploadFileWarning = "Please select a valid file type (.docx, .xlsx, .pdf) or image file";
+            }
+        }
+    }
+}

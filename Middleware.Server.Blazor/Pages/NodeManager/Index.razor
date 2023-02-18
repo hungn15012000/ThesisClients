@@ -1,0 +1,141 @@
+﻿@page "/monitor/"
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Data
+
+@inject INodeService nodeService
+@inject NavigationManager Navigation
+@inject IJSRuntime jsruntime
+@implements IDisposable
+
+<PageTitle>Index</PageTitle>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }    
+</style>
+
+<!-- Button trigger modal -->
+<div class="form-group">
+    <label>
+        NodeId observe:
+        <input @bind="userInput" />
+    </label>
+</div>
+<button @onclick="() => GetNode(userInput)" disabled="@(!IsConnected)">Send</button>
+
+<table class="table table-dark table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col">NodeId</th>
+                <th scope="col">BrowserName</th>
+                <th scope="col">Value</th>
+                <th scope="col">SamplingInterval</th>
+            <th scope="col">Deadband</th>
+            <th scope="col">DeadbandValue</th>
+            <th scope="col">TimeStamp</th>
+
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var model in signalRModel)
+        {
+            <tr>
+                @foreach(var nodeIdsub in nodeListId)
+                {
+                    @if(model.NodeId == nodeIdsub)
+                    {
+                        <td>@model.NodeId</td>
+                        <td>@model.BrowserName</td>
+                        <td>@model.Value</td>
+                        <td>@model.SamplingInterval</td>
+                        <td>@model.DeadBand</td>
+                        <td>@model.DeadBandValue</td>
+                        <td>@model.monitorTime</td>
+                    }
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+
+@code {
+    private string userInput;
+    private List<string> nodeListId = new List<string>();
+    private HubConnection? hubConnection;
+    public List<MonitorNode> signalRModel = new List<MonitorNode>();
+    private JsConsole console;
+    private bool HideButton { get; set; } = true;
+    [Inject]
+    public IActuatorHttpRepository Repo { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await StartHubConnection();
+
+        await Repo.CallNodeEndpoint();
+
+        AddTransferChartDataListener();
+
+    }
+    private async Task StartHubConnection()
+    {
+        nodeListId.Clear();
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://middlewarethesisoisp.azurewebsites.net/monitors")
+            .Build();
+        await hubConnection.StartAsync();
+        if (hubConnection.State == HubConnectionState.Connected)
+            Console.WriteLine("connection started");
+    }
+    private void AddTransferChartDataListener()
+    {
+        hubConnection.On<List<MonitorNode>>("TransferDataMonitors", (data) =>
+        {
+            signalRModel = data;
+            InvokeAsync(StateHasChanged);
+        });
+
+    }
+
+    public void Dispose()
+    {
+        
+    }
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+
+
+    private async Task GetNode(string nodeId)
+    {
+        var confirm = await jsruntime.InvokeAsync<bool>("confirm", $"Are you sure want insert {nodeId} ?");
+        if (confirm)
+        {
+            nodeListId.Add(nodeId);
+        }
+    }
+
+    
+    private void BackToList()
+    {
+        Navigation.NavigateTo("/products/");
+    }
+    private void ToggleButton()
+    {
+        HideButton = !HideButton;
+    }
+
+}

@@ -1,0 +1,98 @@
+﻿@page "/products/details/{id:int}"
+@inject IProductService productService
+@inject NavigationManager navManager
+<h3>Details</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+<EditForm Model="product" >
+    <fieldset disabled="true">
+        <div class="form-group">
+            <label>Product Investigation form</label>
+            <div>
+                <img src="@product.Remark" width="300" height="300" class="img-thumbnail">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="productName">Product Name</label>
+            <InputText @bind-Value="product.ProductName" class="form-control" id="firstname" />
+            <ValidationMessage For="@(() =>product.ProductName)" />
+        </div>
+
+        <div class="form-group">
+            <label for="CustomerName">Product Customer raisee</label>
+            <InputText @bind-Value="product.CustomerName" class="form-control" id="name" />
+            <ValidationMessage For="@(() =>product.CustomerName)" />
+        </div>
+
+         <div class="form-group">
+            <label for="CustomerComany">Product Customer raisee Company</label>
+            <InputText @bind-Value="product.CustomerCompanyName" class="form-control" id="company" />
+            <ValidationMessage For="@(() =>product.CustomerCompanyName)" />
+        </div>
+
+        <div class="form-group">
+            <label for="productSerialNumber">Product Serial Number</label>
+            <InputText @bind-Value="product.ProductSerialNumber" class="form-control" id="lastname" />
+            <ValidationMessage For="@(() =>product.ProductSerialNumber)" />
+        </div>
+
+        <div class="form-group">
+            <label for="productInvoice">Product Invoice</label>
+            <InputText @bind-Value="product.ProductInvoice" class="form-control" id="invoice" />
+            <ValidationMessage For="@(() =>product.ProductInvoice)" />
+        </div>
+
+        <div class="form-group">
+            <label for="productInvoice">Order Date</label>
+            <InputDate @bind-Value="product.OrderDate" class="form-control" id="orderdate" />
+            <ValidationMessage For="@(() =>product.OrderDate)" />
+        </div>
+
+        <div class="form-group">
+            <label for="productQuantity">Product Quantity</label>
+            <InputNumber @bind-Value="product.Quantity" class="form-control" id="productquantity" />
+            <ValidationMessage For="@(() =>product.Quantity)" />
+        </div>
+        <br />
+    </fieldset>
+
+    
+
+    <button class="btn btn-warning" @onclick="GoToEdit">
+        <span class="oi oi-pencil"></span>Edit Product
+    </button>
+
+    <button @onclick="BackToList" class="btn btn-secondary">
+        <span class="oi oi-media-skip-backward"></span>Back To List
+    </button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private ProductDetailDto product = new ProductDetailDto();
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await productService.GetProduct(id);
+        if (response.Success)
+        {
+            product = response.Data;
+        }
+    }
+
+    private void BackToList()
+    {
+        navManager.NavigateTo("/products/");
+    }
+    private void GoToEdit()
+    {
+        navManager.NavigateTo($"/products/update/{product.Id}");
+    }
+}

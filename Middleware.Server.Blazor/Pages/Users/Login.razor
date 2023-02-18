@@ -1,0 +1,97 @@
+﻿@page "/users/login"
+@inject IAuthenticationServices authService
+@inject NavigationManager navManager
+<style>
+    body {
+        background-image: url('/img/loginPage.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .card {
+            margin: 0 auto;
+            width: 50%;
+            border: 2px solid pink;
+            padding: 15px;
+        }
+         .card-img-top {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          width: 50%;
+        }
+        .card-title {text-align: center;}
+        .button-align {text-align: right;}
+        .register-text {text-align: right;}
+    </style>
+</head>
+<body>
+    
+    <div class="card" style="width: 25rem; height: 30rem">
+        <img src="/img/login.png" style="width:200px;height:200px;" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">LOGIN</h5>
+            <EditForm Model="LoginModel" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <InputText class="form-control" @bind-Value="LoginModel.Email"></InputText>
+                    <ValidationMessage For="@(()=>LoginModel.Email)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="Password">Password</label>
+                    <InputText class="form-control" type="password" @bind-Value="LoginModel.Password"></InputText>
+                    <ValidationMessage For="@(()=>LoginModel.Password)" />
+                </div>
+                <br />
+                <div class="register-text">
+                    <a href="/users/register/">Register</a>
+                    <span class="button-align"> <button type="submit" class="btn btn-info">Login</button></span>
+                    
+                </div>
+                
+                
+
+            </EditForm>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+
+@code {
+    LoginUserDto LoginModel = new LoginUserDto();
+    string message = string.Empty;
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await authService.AuthenticateAsync(LoginModel);
+            if(response)
+            {
+                navManager.NavigateTo("/");
+            }
+            message = "Invalid credential, please try again!";
+        }
+        catch (ApiException ex)
+        {
+
+            if (ex.StatusCode >= 200 && ex.StatusCode <= 299)
+            {
+                
+            }
+            message = ex.Response;
+        }
+    }
+}

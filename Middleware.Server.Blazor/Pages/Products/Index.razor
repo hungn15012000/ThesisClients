@@ -1,0 +1,124 @@
+﻿@page "/products/"
+@using Microsoft.AspNetCore.Mvc
+@inject IProductService productService
+@inject IJSRuntime jsruntime
+
+<h3>Index</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+@if (response.Success == false)
+{
+    <div class="alert alert-danger ">
+        <h4>@response.Message</h4>
+    </div>
+}
+
+@if (products == null)
+{
+    <div class="alert alert-info">
+        <h4>Loading data...</h4>
+    </div>
+}
+else
+{
+    <AuthorizeView Roles="Administrator">
+        <div id="elementCreate">
+            <a class="btn btn-dark " href="/products/create">
+                <span class="oi oi-plus" aria-hidden="true"></span> Create
+            </a>
+        </div>
+
+    </AuthorizeView>
+    <br />
+    <div id="elementExport">
+        <a class="btn btn-dark " @onclick="DownloadFileFromStream">
+            <span class="oi oi-plus" aria-hidden="true"></span> Download Report
+        </a>
+    </div>
+
+
+    <br />
+
+    <table class="table table-responsive">
+        <tr>
+            <th>Product Name</th>
+            <th>Product Serial Number</th>
+            <th>Customer</th>
+            <th>Action</th>
+
+        </tr>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.ProductName</td>
+                    <td>@product.ProductSerialNumber</td>
+                    <td><a class="btn-link" href="/customers/details/@product.CustomerId">@product.CustomerName</a></td>
+                    <td>
+                        <img src="@product.Remark" width="100px" height="100px" alt="@product.ProductInvoice" />
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" href="/products/details/@product.Id"> <span class="oi oi-book" aria-hidden="true"></span>Details</a>
+
+                        <AuthorizeView Roles="Administrator">
+                            <a class="btn btn-warning" href="/products/update/@product.Id"><span class="oi oi-pencil" aria-hidden="true"></span>Edit</a>
+                            <button class="btn btn-danger" @onclick=@(()=> Delete(@product.Id)) href="/products/delete"><span class="oi oi-delete" aria-hidden="true"></span>Delete</button>
+                        </AuthorizeView>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private List<ProductReadDto> products;
+    private Response<List<ProductReadDto>> response = new Response<List<ProductReadDto>> { Success = true };
+    protected override async Task OnInitializedAsync()
+    {
+        response = await productService.GetProducts();
+        if (response.Success == true)
+        {
+            products = response.Data;
+        }
+
+    }
+    private async Task Delete(int id)
+    {
+        var product = products.First(q => q.Id == id);
+        var confirm = await jsruntime.InvokeAsync<bool>("confirm", $"Are you sure want to delete {product.ProductName}?");
+        if (confirm)
+        {
+            var response = await productService.Delete(id);
+            if (response.Success == true)
+            {
+                await OnInitializedAsync();
+            }
+        }
+
+    }
+    private Stream GetFileStream(byte[] fileBytes)
+    {
+        var fileStream = new MemoryStream(fileBytes);
+
+        return fileStream;
+    }
+    public async Task<FileStreamResult> DownloadFileFromStream()
+    {
+       var responseDownload = await productService.Download();
+        byte[] fileContents = (byte[])responseDownload.Data.GetValue("fileContents");
+        var fileStream = GetFileStream(fileContents);
+        string fileDownloadName = responseDownload.Data.GetValue("fileDownloadName").ToString();
+        var streamRef = new DotNetStreamReference(stream: fileStream);
+        await jsruntime.InvokeVoidAsync("downloadFileFromStream", fileDownloadName, streamRef);
+        return new FileStreamResult(fileStream, "application/octet-stream");
+        
+    }
+   
+}

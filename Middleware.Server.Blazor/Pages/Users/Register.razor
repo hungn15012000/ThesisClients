@@ -1,0 +1,242 @@
+﻿@page "/users/register"
+@inject IClient httpClient
+@inject NavigationManager navManager
+
+<style>
+    body {
+        background-image: url('/img/loginPage.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+<!DOCTYPE html>
+<html>
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+/* Add a background color when the inputs get focus */
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for all buttons */
+button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+}
+
+button:hover {
+  opacity:1;
+}
+
+/* Extra styles for the cancel button */
+.cancelbtn {
+  padding: 14px 20px;
+  background-color: #f44336;
+}
+
+/* Float cancel and signup buttons and add an equal width */
+.cancelbtn, .signupbtn {
+  float: left;
+  width: 50%;
+}
+
+/* Add padding to container elements */
+.container {
+  padding: 16px;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: #474e5d;
+  padding-top: 50px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* Style the horizontal ruler */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+ 
+/* The Close Button (x) */
+.close {
+  position: absolute;
+  right: 35px;
+  top: 15px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #f1f1f1;
+}
+
+.close:hover,
+.close:focus {
+  color: #f44336;
+  cursor: pointer;
+}
+
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+    
+    
+/* Change styles for cancel button and signup button on extra small screens */
+
+</style>
+</html>
+@if (string.IsNullOrEmpty(message) == false)
+{
+    <div class="alert alert-danger">
+        <p>@message</p>
+    </div>
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .card {
+            margin: 0 auto;
+            width: 50%;
+            border: 2px solid pink;
+            padding: 15px;
+        }
+
+        .card-img-top {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        .card-title {
+            text-align: center;
+        }
+
+        .button-align {
+            text-align: right;
+        }
+
+        .register-text {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" style="width: 25rem; height: 40rem">
+        <img src="/img/login.png" style="width:200px;height:200px;" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">SIGN UP</h5>
+            <EditForm Model="RegistrationModel" OnValidSubmit="HandleRegistration">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <InputText class="form-control" @bind-Value="RegistrationModel.Email"></InputText>
+                    <ValidationMessage For="@(()=>RegistrationModel.Email)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="Firstname">First Name</label>
+                    <InputText class="form-control" @bind-Value="RegistrationModel.Firstname"></InputText>
+                    <ValidationMessage For="@(()=>RegistrationModel.Firstname)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="Lastname">Last Name</label>
+                    <InputText class="form-control" @bind-Value="RegistrationModel.LastName"></InputText>
+                    <ValidationMessage For="@(()=>RegistrationModel.LastName)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="Password">Password</label>
+                    <InputText class="form-control" type="password" @bind-Value="RegistrationModel.Password"></InputText>
+                    <ValidationMessage For="@(()=>RegistrationModel.Password)" />
+                </div>
+
+                @*<button type="submit" class="btn-outline-primary btn-block">Register</button>*@
+                <div class="clearfix">
+                    <button type="button" @onclick="NavigationToHome" class="cancelbtn">Cancel</button>
+                    <button type="submit" class="signupbtn">Sign Up</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+@code {
+    UserDto RegistrationModel = new UserDto
+        {
+            Role = "User"
+        };
+    string message = string.Empty;
+    private async Task HandleRegistration()
+    {
+        RegistrationModel.Role = "Users";
+        try
+        {
+            await httpClient.RegisterAsync(RegistrationModel);
+            navManager.NavigateTo("users/login");
+        }
+        catch (ApiException ex)
+        {
+            if(ex.StatusCode >= 200 && ex.StatusCode <= 299)
+            {
+                NavigationToLogin();
+            }
+            message = ex.Response;
+        }
+
+
+    }
+    private async Task NavigationToLogin()
+    {
+        navManager.NavigateTo("users/login");
+    }
+    private async Task NavigationToHome()
+    {
+        navManager.NavigateTo("/");
+    }
+}

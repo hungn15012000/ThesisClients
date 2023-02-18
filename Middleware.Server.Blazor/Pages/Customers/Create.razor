@@ -1,0 +1,60 @@
+﻿@page "/customers/create/"
+
+@inject ICustomerService customerService
+@inject NavigationManager navManager
+@attribute [Authorize(Roles = Roles.Administrator)]
+<h3>Create New Customer</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }    
+</style>
+<EditForm Model="customer" OnValidSubmit="HandleCreateCustomer">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="firstname">FirstName</label>
+        <InputText @bind-Value="customer.Firstname" class="form-control" id="firstname" />
+        <ValidationMessage For="@(() =>customer.Firstname)" />
+    </div>
+
+    <div class="form-group">
+        <label for="lastname">Lastname</label>
+        <InputText @bind-Value="customer.Lastname" class="form-control" id="lastname" />
+        <ValidationMessage For="@(() =>customer.Lastname)" />
+    </div>
+
+    <div class="form-group">
+        <label for="companyname">Company Name</label>
+        <InputText @bind-Value="customer.CompanyName" class="form-control" id="companyname" />
+        <ValidationMessage For="@(() =>customer.CompanyName)" />
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <span class="oi oi-plus"></span>Create Customer
+    </button>
+
+    <button @onclick="BackToList" class="btn btn-secondary">
+        <span class="oi oi-media-skip-backward"></span>Back To List
+    </button>
+</EditForm>
+
+
+
+@code {
+    private CustomerCreateDto customer = new CustomerCreateDto();
+    private async Task HandleCreateCustomer()
+    {
+        var response = await customerService.CreateCustomer(customer);
+        if(response.Success)
+        {
+            BackToList();
+        }
+    }
+    private void BackToList()
+    {
+        navManager.NavigateTo("/customers/");
+    }
+}

@@ -1,0 +1,100 @@
+﻿@page "/customers/details/{id:int}"
+@inject ICustomerService customerService
+@inject NavigationManager navManager
+<h3>Details</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+<EditForm Model="customer">
+    <fieldset disabled="true">
+        <div class="form-group">
+            <label for="firstname">FirstName</label>
+            <InputText @bind-Value="customer.Firstname" class="form-control" id="firstname" />
+            <ValidationMessage For="@(() =>customer.Firstname)" />
+        </div>
+
+        <br />
+        <div class="form-group">
+            <label for="lastname">Lastname</label>
+            <InputText @bind-Value="customer.Lastname" class="form-control" id="lastname" />
+            <ValidationMessage For="@(() =>customer.Lastname)" />
+        </div>
+
+        <br />
+        <div class="form-group">
+            <label for="companyname">Company Name</label>
+            <InputText @bind-Value="customer.CompanyName" class="form-control" id="companyname" />
+            <ValidationMessage For="@(() =>customer.CompanyName)" />
+        </div>
+        <br />
+    </fieldset>
+
+    @if (customer.Products == null || customer.Products.Any() == false)
+    {
+        <div class="alert alert-dismissible alert-secondary">
+            No product for this customer
+        </div>
+    }
+    else
+    {
+
+        <div class="row">
+            @foreach (var product in customer.Products)
+            {
+            
+                <div class="col-3">
+                    <div class="card" style="width: 18rem;">
+                        <img src="@product.Remark" class="card-img-top" alt="@product.ProductName">
+                        <div class="card-body">
+                            <h5 class="card-title">@product.ProductSerialNumber</h5>
+                            <p class="card-text">@product.ProductInvoice</p>
+                            <a href="#" class="btn btn-primary">View Product</a>
+                        </div>
+                    </div>
+                </div>
+            
+            <br />
+            }
+
+        </div>
+        
+    }
+    <br />
+    <button @onclick="GoToEdit" class="btn btn-warning">
+        <span class="oi oi-pencil"></span>Edit Customer
+    </button>
+
+    <button @onclick="BackToList" class="btn btn-secondary">
+        <span class="oi oi-media-skip-backward"></span>Back To List
+    </button>
+
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private CustomerDetailDto customer = new CustomerDetailDto();
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await customerService.GetCustomer(id);
+        if (response.Success)
+        {
+            customer = response.Data;
+        }
+    }
+
+    private void BackToList()
+    {
+        navManager.NavigateTo("/customers/");
+    }
+    private void GoToEdit()
+    {
+        navManager.NavigateTo($"/customers/update/{customer.Id}");
+    }
+}

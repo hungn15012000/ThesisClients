@@ -1,0 +1,713 @@
+﻿@page "/scada/ui"
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.Data
+
+@inject INodeService nodeService
+@inject NavigationManager Navigation
+@inject IJSRuntime jsruntime
+@implements IAsyncDisposable
+<PageTitle>UI</PageTitle>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+<button @onclick="UserInterface" class="btn btn-warning">
+        <span class="oi oi-pencil"></span>Go To Dashboard
+    </button>
+@foreach (var item in signalRModel)
+{
+    if (item.Label.ToString() == "Belt")
+    {
+        Belt = item.Data;
+        if (Belt) color = "green";
+        else color = "black";
+    }
+    if (item.Label.ToString() == "Pick")
+    {
+        Pick = item.Data;
+    }
+    if (item.Label.ToString() == "Release")
+    {
+        Release = item.Data;
+    }
+    if (item.Label.ToString() == "XLeft")
+    {
+        XLeft = item.Data;
+        if (XLeft) colorXLeft = "green";
+        else colorXLeft = "black";
+    }
+    if (item.Label.ToString() == "XRight")
+    {
+        XRight = item.Data;
+        if (XRight) colorXRight = "green";
+        else colorXRight = "black";
+    }
+    if (item.Label.ToString() == "ZDown")
+    {
+        ZDown = item.Data;
+        if (ZDown) colorZDown = "green";
+        else colorZDown = "black";
+    }
+    if (item.Label.ToString() == "ZUp")
+    {
+        ZUp = item.Data;
+        if (ZUp) colorZUp = "green";
+        else colorZUp = "black";
+    }
+    if (item.Label.ToString() == "PushBack")
+    {
+        PushBack = item.Data;
+    }
+    if (item.Label.ToString() == "PushFront")
+    {
+        PushFront = item.Data;
+    }
+    if (item.Label.ToString() == "SSBeltBegin")
+    {
+        SSBeltBegin = item.Data;
+    }
+    if (item.Label.ToString() == "SSBeltEnd")
+    {
+        SSBeltEnd = item.Data;
+    }
+    if (item.Label.ToString() == "SSPusherBack")
+    {
+        SSPusherBack = item.Data;
+        if (SSPusherBack)
+            colorSSPusherBack = "green";
+        else colorSSPusherBack = "black";
+    }
+    if (item.Label.ToString() == "SSPusherFront")
+    {
+        SSPusherFront = item.Data;
+        if (SSPusherFront)
+            colorSSPusherFront = "green";
+        else colorSSPusherFront = "black";
+    }
+    if (item.Label.ToString() == "SSX0")
+    {
+        SSX0 = item.Data;
+        if (SSX0)
+            colorSSX0 = "green";
+        else colorSSX0 = "black";
+    }
+    if (item.Label.ToString() == "SSX1")
+    {
+        SSX1 = item.Data;
+        if (SSX1)
+            colorSSX1 = "green";
+        else colorSSX1 = "black";
+    }
+    if (item.Label.ToString() == "SSX2")
+    {
+        SSX2 = item.Data;
+        if (SSX2)
+            colorSSX2 = "green";
+        else colorSSX2 = "black";
+    }
+    if (item.Label.ToString() == "SSX3")
+    {
+        SSX3 = item.Data;
+        if (SSX3)
+            colorSSX3 = "green";
+        else colorSSX3 = "black";
+    }
+    if (item.Label.ToString() == "SSZDown")
+    {
+        SSZDown = item.Data;
+         if (SSZDown)
+            colorSSZDown = "green";
+        else colorSSZDown = "black";
+
+    }
+    if (item.Label.ToString() == "SSZUp")
+    {
+        SSZUp = item.Data;
+        if (SSZUp)
+          colorSSZUp = "green";
+        else colorSSZUp = "black";
+    }
+
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .frame {
+            margin: 6px;
+            width: 30%;
+            height: 100x;
+            border: 4px solid pink;
+            padding: 15px;
+            top: 50px;
+            position: absolute;
+            z-index: 13
+        }
+
+        .machine {
+            object-fit: fill;
+            margin: 5px;
+            width: 640px;
+            position: relative;
+            top: 50px;
+            left: 450px;
+        }
+
+        .belt {
+            width: 640px;
+            height: 2px;
+            background: @color;
+            box-shadow: 0px 29px 0 @color;
+            /* box-shadow: 105px 0px 0 black, 210px 0px 0 black, 315px 0px 0 black, 0px 29px 0 black, 105px 29px 0 black, 210px 29px 0 black, 315px 29px 0 black;
+                */
+            position: relative;
+            margin: 0 auto;
+        }
+
+            .belt:before {
+                content: "";
+                width: 70px;
+                height: 42px;
+                border: 3px solid @color;
+                border-radius: 50%;
+                border-top-color: transparent;
+                border-right-color: transparent;
+                border-bottom-color: transparent;
+                position: absolute;
+                top: -8px;
+                left: -9px;
+            }
+
+            .belt:after {
+                content: "";
+                width: 70px;
+                height: 42px;
+                border: 3px solid @color;
+                border-radius: 50%;
+                border-top-color: transparent;
+                border-left-color: transparent;
+                border-bottom-color: transparent;
+                position: absolute;
+                top: -8px;
+                right: -9px;
+            }
+
+        .TheseAreTheBreaks {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+            top: -5px;
+            left: 0px;
+            z-index: 10;
+            box-shadow: -80px 0px 0 white, -160px 0px 0 white, -240px 0px 0 white, -320px 0px 0 white, -400px 0px 0 white, -480px 0px 0 white, -560px 0px 0 white, 80px 0px 0 white, 160px 0px 0 white, 240px 0px 0 white, 320px 0px 0 white, 400px 0px 0 white, 480px 0px 0 white, 560px 0px 0 white, 640px 0px 0 white;
+            animation: roll 10s linear infinite;
+            z-index: 10;
+        }
+
+        .TheseAreTheBreaks_Again {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+            top: 15px;
+            right: 0;
+            z-index: 11;
+            box-shadow: 80px 0px 0 white, 160px 0px 0 white, 240px 0px 0 white, 320px 0px 0 white, 400px 0px 0 white, 480px 0px 0 white, 560px 0px 0 white, 640px 0px 0 white, 720px 0px 0 white, 800px 0px 0 white, 880px 0px 0 white, 960px 0px 0 white, 1040px 0px 0 white, 1120px 0px 0 white, 1200px 0px 0 white, 1280px 0px 0 white, 1360px 0px 0 white;
+            animation: rollback 10s linear infinite;
+            z-index: 11;
+        }
+
+        .initialSensor {
+            z-index: 40;
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .endSensor {
+            z-index: 40;
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            right: 0px;
+        }
+
+        .Pusher {
+            z-index: 40;
+            position: relative;
+            width: 100px;
+            height: 100px;
+            transform: rotate(90deg);
+            top: 30px;
+        }
+
+        .SSPusherFront {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: @colorSSPusherFront;
+            z-index: 40;
+            top: 0px;
+            right: 100px;
+            position: relative;
+            border-radius: 50%;
+        }
+
+        .SSPusherBack {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: @colorSSPusherBack;
+            top: 40px;
+            right: 125px;
+            z-index: 40;
+            position: relative;
+            border-radius: 50%;
+        }
+
+        .SSX0 {
+            display: inline-block;
+            width: 50px;
+            height: 40px;
+            z-index: 40;
+            margin: 25px 25px 25px 25px;
+            position: relative;
+            border-radius: 50%;
+            background: @colorSSX0;
+        }
+
+        .SSX1 {
+            display: inline-block;
+            width: 50px;
+            height: 40px;
+            z-index: 40;
+            margin: 25px 25px 25px 25px;
+            position: relative;
+            border-radius: 50%;
+            background: @colorSSX1;
+        }
+
+        .SSX2 {
+            display: inline-block;
+            width: 50px;
+            height: 40px;
+            margin: 25px 25px 25px 25px;
+            z-index: 40;
+            position: relative;
+            border-radius: 50%;
+            background: @colorSSX2;
+        }
+
+        .SSX3 {
+            display: inline-block;
+            width: 50px;
+            height: 40px;
+            margin: 25px 25px 25px 25px;
+            z-index: 40;
+            position: relative;
+            border-radius: 50%;
+            background: @colorSSX3;
+        }
+        .ReleaseClaw {
+            display: inline-block;
+            width: 200px;
+            height: 200x;
+            margin: 25px 25px 25px 25px;
+            z-index: 40;
+            position: relative;
+            border-radius: 50%;
+        }
+        .PickClaw {
+            display: inline-block;
+            width: 200px;
+            height: 200x;
+            margin: 25px 25px 25px 25px;
+            z-index: 40;
+            position: relative;
+            border-radius: 50%;
+            background: rgb(208,228,228);
+        }
+
+        .camera {
+            z-index: 41;
+            position: absolute;
+            top: 10px;
+            left: 300px;
+            width: 70px;
+            height: 70px;
+        }
+
+        .package1 {
+            display: block;
+            width: 50px;
+            height: 40px;
+            background: @color;
+            z-index: 40;
+            position: relative;
+            transform-origin: 100% 100%;
+            animation-timing-function: ease;
+        }
+
+        .package2 {
+            display: block;
+            width: 50px;
+            height: 40px;
+            background: @color;
+            z-index: 40;
+            position: relative;
+            transform-origin: 100% 100%;
+            animation: toSortStage 5s infinite;
+            animation-timing-function: ease;
+        }
+
+
+        @@keyframes toSortStage {
+            from {
+                left: 0px;
+            }
+
+            to {
+                left: 600px;
+            }
+        }
+
+        .gear {
+            float: left;
+            display: inline-block;
+            border: 5px solid @color;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            position: relative;
+            top: 5px;
+            animation: load 3s linear infinite;
+            z-index: 20;
+        }
+
+            .gear:before {
+                background: @color;
+                width: 5px;
+                height: 5px;
+                position: absolute;
+                content: "";
+                top: -6px;
+                left: 10px;
+                box-shadow: 12px 10px 0 black, 0px 23px 0 black, -11px 10px 0 black;
+                -webkit-transform: rotate(45deg);
+            }
+
+            .gear:after {
+                background: @color;
+                width: 5px;
+                height: 5px;
+                position: absolute;
+                content: "";
+                top: -9px;
+                left: 2px;
+                box-shadow: 12px 10px 0 black, 0px 23px 0 black, -11px 10px 0 black;
+            }
+
+        .right {
+            float: right;
+        }
+
+        @@keyframes load {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes roll {
+            100% {
+                left: 100%;
+            }
+        }
+
+        @@keyframes rollback {
+            100% {
+                right: 100%;
+            }
+        }
+
+        @@keyframes rollandfall {
+            47.5% {
+                left: 95%;
+                top: 0;
+                transform: rotate(0deg);
+            }
+
+            50% {
+                left: 100%;
+                top: 0;
+                transform: rotate(25deg);
+            }
+
+            55% {
+                left: 110%;
+                top: 100px;
+                transform: rotate(720deg);
+            }
+        }
+
+        .Xleft {
+          width:100px;
+          height:30px;
+          display: flex;
+          top: 200px;
+          transform: rotate(180deg);
+
+
+        }
+        .Xleft:before {
+          content: "";
+          background: @colorXLeft;
+          width:15px;
+          clip-path: polygon(0 10px,calc(100% - 15px) 10px,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,calc(100% - 15px) calc(100% - 10px),0 calc(100% - 10px));
+          animation: a1 1.5s infinite linear;
+        }
+        .Xright {
+          width:100px;
+          height:30px;
+          display: flex;
+          top: 200px;
+
+
+        }
+        .Xright:before {
+          content: "";
+          background: @colorXRight;
+          width:15px;
+          clip-path: polygon(0 10px,calc(100% - 15px) 10px,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,calc(100% - 15px) calc(100% - 10px),0 calc(100% - 10px));
+          animation: a1 1.5s infinite linear;
+        }
+        .Zup {
+          width:100px;
+          height:30px;
+          display: flex;
+          position: absolute;
+          top: 500px;
+          left: 400px;
+          transform: rotate(270deg);
+
+        }
+        .Zup:before {
+          content: "";
+          background: @colorZUp;
+          width:15px;
+          clip-path: polygon(0 10px,calc(100% - 15px) 10px,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,calc(100% - 15px) calc(100% - 10px),0 calc(100% - 10px));
+          animation: a1 1.5s infinite linear;
+        }
+        .Zdown {
+          width:100px;
+          height:30px;
+          display: flex;
+          position: absolute;
+          top: 500px;
+          left: 600px;
+          transform: rotate(90deg);
+
+
+        }
+        .Zdown:before {
+          content: "";
+          background: @colorZDown;
+          width:15px;
+          clip-path: polygon(0 10px,calc(100% - 15px) 10px,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,calc(100% - 15px) calc(100% - 10px),0 calc(100% - 10px));
+          animation: a1 1.5s infinite linear;
+        }
+        @@keyframes a1 {
+          90%,100%{flex-grow: 1}
+        }
+    </style>
+</head>
+<body>
+   
+   
+
+</body>
+</html>
+
+@if(SCADA)
+{
+<div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+</div>
+}
+<div class="machine" hidden="@SCADA">
+    <img src="/img/sensorOff.jpg" class="initialSensor" alt="..." hidden="@SSBeltBegin">
+    <img src="/img/sensorOff.jpg" class="endSensor" alt="..." hidden="@SSBeltEnd">
+    <img src="/img/sensorOn.jpg" class="initialSensor" alt="..." hidden="@(!SSBeltBegin)">
+    <img src="/img/sensorOn.jpg" class="endSensor" alt="..." hidden="@(!SSBeltEnd)">
+    <img src="/img/camerabox.png" class="camera" alt="...">
+    <div class="package1" hidden="@(Belt)"></div>
+    <div class="package2" hidden="@(!Belt)"></div>
+    <div class="belt">
+        <div class="TheseAreTheBreaks" hidden="@(!Belt)"></div>
+        <div class="TheseAreTheBreaks_Again" hidden="@(!Belt)"></div>
+    </div>
+
+    <img src="/img/pneumaticOff.png" class="Pusher" alt="..." hidden="@(PushFront)">
+    <img src="/img/pneumaticOn.png" class="Pusher" alt="..." hidden="@(!PushFront)">
+    <div class="SSPusherFront"></div>
+    <div class="SSPusherBack"></div>
+    <br />
+    SSX0<img src="/img/magneticSensorOff.png" class="SSX0" alt="...">
+    SSX1<img src="/img/magneticSensorOff.png" class="SSX1" alt="...">
+    SSX2<img src="/img/magneticSensorOff.png" class="SSX2" alt="...">
+    SSX3<img src="/img/magneticSensorOff.png" class="SSX3" alt="...">
+    <br/>
+    RIGHT<div class="Xright"></div>
+    LEFT<div class="Xleft"></div>
+    <div class="Zup"></div>
+    <div class="Zdown"></div>
+    <img src="/img/robotclawclose.jpg" class="ReleaseClaw" alt="..." hidden="@(!Pick)">
+    <img src="/img/robotclawopen.jpg" class="PickClaw" alt="..." hidden="@(Pick)">
+
+    
+</div>
+
+<!-- Button trigger modal -->
+@code {
+    private bool SCADA { get; set; } = true;
+    private bool Belt { get; set; } = true;
+    private bool BeginSensor { get; set; } = true;
+    private bool EndSensor { get; set; } = true;
+    private bool PushFront { get; set; } = true;
+    private bool PushBack  { get; set; } = true;
+    private bool ZDown { get; set; } = true;
+    private bool ZUp { get; set; } = true;
+    private bool XRight { get; set; } = true;
+    private bool XLeft { get; set; } = true;
+
+    private bool Pick { get; set; } = true;
+    private bool Release { get; set; } = true;
+    private bool SSBeltBegin { get; set; } = true;
+    private bool SSBeltEnd { get; set; } = true;
+    private bool SSZUp { get; set; } = true;
+    private bool SSZDown { get; set; } = true;
+    private bool SSPusherFront { get; set; } = true;
+    private bool SSPusherBack  { get; set; } = true;
+
+    private bool SSX0 { get; set; } = true;
+    private bool SSX1 { get; set; } = true;
+    private bool SSX2 { get; set; } = true;
+    private bool SSX3 { get; set; } = true;
+    private string color = "black";
+    private string colorSSPusherBack = "black";
+    private string colorSSPusherFront = "black";
+     private string colorSSX0 = "black";
+    private string colorSSX1 = "black";
+     private string colorSSX2 = "black";
+    private string colorSSX3 = "black";
+    private string colorSSZUp = "black";
+    private string colorSSZDown = "black";
+    private string colorZUp = "black";
+    private string colorZDown = "black";
+    private string colorXLeft = "black";
+    private string colorXRight = "black";
+
+    private HubConnection? hubConnection;
+    private List<string> messages = new List<string>();
+    private string? userInput;
+    private string? messageInput;
+    private string? NodeId;
+    private const string? falseInput = "false";
+    private const string? trueInput = "true";
+    private JObject result;
+    //DataTable tester = (DataTable)JsonConvert.DeserializeObject(json, (typeof(DataTable)));
+    private ModelEdit modelEdit = new ModelEdit();
+    public List<SignalRModel> signalRModelPrev = new List<SignalRModel>();
+    public List<SignalRModel> signalRModel = new List<SignalRModel>();
+    public List<SignalRModelDisplay> signalRModelDisplay = new List<SignalRModelDisplay>();
+    private JsConsole console;
+    private Popup popupRef;
+
+    [Inject]
+    public IActuatorHttpRepository Repo { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await StartHubConnection();
+
+        await Repo.CallChartEndpoint();
+
+        AddTransferChartDataListener();
+
+    }
+    private async Task StartHubConnection()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://middlewarethesisoisp.azurewebsites.net/charts")
+            .Build();
+        await hubConnection.StartAsync();
+        if (hubConnection.State == HubConnectionState.Connected)
+        {
+            Console.WriteLine("connection started");
+            SCADA = false;
+        }
+            
+    }
+    private void AddTransferChartDataListener()
+    {
+        hubConnection.On<List<SignalRModel>>("TransferDataScada", (data) =>
+        {
+            var displaydata = data;
+            signalRModelPrev = signalRModel;
+            signalRModel = displaydata;
+            InvokeAsync(StateHasChanged);
+
+        });
+
+    }
+
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+    private void ToggleBelt()
+    {
+        Belt = !Belt;
+        if (Belt) color = "black";
+        else color = "green";
+    }
+    private void ToggleBeginSensor()
+    {
+        BeginSensor = !BeginSensor;
+    }
+    private void ToggleEndSensor()
+    {
+        EndSensor = !EndSensor;
+    }
+    private async Task WriteNode(string nodeId, string body)
+    {
+        var nodeResponse = await nodeService.PostValue(nodeId, body);
+        if (nodeResponse.Success)
+        {
+
+        }
+    }
+    private void UserInterface()
+    {
+        Navigation.NavigateTo("/scada/");
+
+    }
+}
+
+
+

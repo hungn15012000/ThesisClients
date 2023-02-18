@@ -1,0 +1,88 @@
+﻿@page "/customers/"
+@inject ICustomerService customerService
+@inject IJSRuntime jsruntime
+<h3>Index</h3>
+<style>
+    body {
+        background-image: url('/img/homebackground.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+@if (response.Success == false)
+{
+    <div class="alert alert-danger ">
+        <h4>@response.Message</h4>
+    </div>
+}
+
+@if (customers == null)
+{
+    <div class="alert alert-info">
+        <h4>Loading data...</h4>
+    </div>
+}
+else
+{
+    <AuthorizeView Roles="Admistrator">
+        <a class="btn btn-dark " href="/customers/create">
+            <span class="oi oi-plus" aria-hidden="true"></span> Create
+        </a>
+    </AuthorizeView>
+
+    <br />
+    <table class="table table-responsive">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Action</th>
+
+        </tr>
+        <tbody>
+            @foreach (var customer in customers)
+            {
+                <tr>
+                    <td>@customer.Firstname</td>
+                    <td>@customer.Lastname</td>
+                    <td>
+                        <a class="btn btn-primary" href="/customers/details/@customer.Id"> <span class="oi oi-book" aria-hidden="true"></span>Details</a>
+
+                        <AuthorizeView Roles="Administrator">
+                            <a class="btn btn-warning" href="/customers/update/@customer.Id"><span class="oi oi-pencil" aria-hidden="true"></span>Edit</a>
+                            <button class="btn btn-danger" @onclick=@(()=> Delete(@customer.Id)) href="/customers/delete"><span class="oi oi-delete" aria-hidden="true"></span>Delete</button>
+                        </AuthorizeView>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private List<CustomerReadDto> customers;
+    private Response<List<CustomerReadDto>> response = new Response<List<CustomerReadDto>> { Success = true };
+    protected override async Task OnInitializedAsync()
+    {
+        response = await customerService.GetCustomers();
+        if (response.Success == true)
+        {
+            customers = response.Data;
+        }
+
+    }
+    private async Task Delete(int id)
+    {
+        var customer = customers.First(q => q.Id == id);
+        var confirm = await jsruntime.InvokeAsync<bool>("confirm", $"Are you sure want to delete {customer.Firstname} {customer.Lastname}?");
+        if (confirm)
+        {
+            var response = await customerService.Delete(id);
+            if (response.Success == true)
+            {
+                await OnInitializedAsync();
+            }
+        }
+
+    }
+}
