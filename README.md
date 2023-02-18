@@ -55,10 +55,7 @@ The frontend is built using .NET Blazor Server.
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
-
-* [![ASP .NET][https://dotnet.microsoft.com/en-us/apps/aspnet]][ASPNET-url]
+This section should list any major frameworks/libraries used to bootstrap my project. 
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
 * [![JQuery][JQuery.com]][JQuery-url]
 
@@ -69,16 +66,280 @@ This section should list any major frameworks/libraries used to bootstrap your p
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+OPC UA Web Platfrom requires .NET 6, available for Windows, Linux and MacOS [here](https://www.microsoft.com/net/learn/get-started).
+
+Start cloning the project in your local machine and configure it
+in order to expose your OPC UA Servers through the OPC UA Web Platform interface:
+
+1. Clone the project in a local folder:
+
+    `git clone https://github.com/hungn15012000/ThesisClients.git`
+
+2. Edit the application configuration file **appsettings.json** setting all
+the information relevant to the OPC UA servers you want to be exposed by the platform
+
+    ```js
+    "OPCUAServersOptions": {
+        "Servers": [
+          {
+            "Name": "UaCppLocalServer",
+            "Url": "opc.tcp://localhost:48010"
+          },
+          {
+            "Name": "Raspberry Server",
+            "Url": "opc.tcp://192.168.1.101:48010"
+          }
+        ]
+      }
+    ```
+
+    You can edit the configuration file in order to change JWT authentication parameter too.
+
+3. Edit the file **OPCUAWebClatform.Config.xml** in order to set all the configuration
+relevant to the OPC UA Middleware embedded in the platform (which is itself 
+an OPC UA Client, so it requires its own configuration).
+
+4. Go in the project directory and run the project
+
+    `dotnet run`
+
+    N.B. You have to take care about running the Web Platform in *Development* or 
+*Production* configuration. You can choose the configuration setting the 
+environment variable **ASPNETCORE_ENVIRONMENT**, as explained [here](https://docs.microsoft.com/it-it/aspnet/core/fundamentals/environments).
+
+### Run on Docker container
+
+It is possible to run OPC UA Web Platform on Docker container with the following command
+
+`docker run --rm -it -p 5000:80 marsala/opcua-web-platform:1.0.0`
+
+### Troubleshooting
+
+You may occur in error like "DataSet Not Available" even if all the ip addresses or your OPC UA Server are perfectly configured. Be aware you have configured the platform **Instance Certificate** in the OPC UA Servers **Trusted** certificate store.
+
+## Examples
+
+In the following will be highlighted some common use cases for the OPC UA Web Platform. Remember that all
+request to the Api with the initial enpoint **/api/** require an authentication token. A valid token can be
+obtained with a simple request to the following API endpoint:
+
+`POST http://{{base_url}}/auth/authenticate`
+
+The response will contain a valid token that must be included in an header **"Authorization"** like shown
+in the following examples.
+
+This is an example request of authentication using the default Authentication service mock:
+
+```
+curl -X POST \
+  http://localhost:5000/auth/authenticate \
+  -F username=admin \
+  -F password=password
+```
+
+### Read the standard OPC UA Server *Object* Node
+
+Suppose that the DataSet with dataset-id = 3 correspond to the OPC UA Server exposed by the platform
+you are interested. So, if you want to start browsing the data set you have to make a request like 
+the following:
+
+`GET http://{{base_url}}/api/data-sets/3/nodes`
+
+You can make a request with:
+
+```
+curl -X GET http://{{YOUR-URL}}:5000/api/data-sets/2/nodes 
+  -H 'Authorization: Bearer {YOUR-AUTHENTICATION-TOKEN}'
+```
+
+It will return the response:
+
+```js
+{
+    "node-id": "0-85",
+    "name": "Objects",
+    "type": "folder",
+    "edges": [
+        {
+            "node-id": "0-2253",
+            "name": "Server",
+            "Type": "object",
+            "relationship": "Organizes"
+        },
+        {
+            "node-id": "3-BuildingAutomation",
+            "name": "BuildingAutomation",
+            "Type": "folder",
+            "relationship": "Organizes"
+        },
+        {
+            "node-id": "2-Demo",
+            "name": "Demo",
+            "Type": "folder",
+            "relationship": "Organizes"
+        },
+        {
+            "node-id": "5-Demo",
+            "name": "DemoUANodeSetXML",
+            "Type": "folder",
+            "relationship": "Organizes"
+        }
+    ]
+}
+```
+
+### Read the a Node
+
+Read the state of a Variable Node:
+
+`GET http://{{base_url}}/api/data-sets/3/nodes/2-Demo.Static.Scalar.WorkOrder`
+
+You can make a request with:
+
+```
+curl -X GET \
+  http://{YOUR-URL}/api/data-sets/3/nodes/2-Demo.Static.Scalar.WorkOrder \
+  -H 'Authorization: Bearer {YOUR-AUTHENTICATION-TOKEN}' \
+```
+
+It will return the response:
+
+```js
+{
+    "node-id": "2-Demo.Static.Scalar.WorkOrder",
+    "name": "WorkOrder",
+    "type": "variable",
+    "value": {
+        "ID": "9240890a-6ea8-41fc-8e84-f47edd3e3595",
+        "AssetID": "123-X-Y-Z",
+        "StartTime": "2018-04-20T14:24:39.085941Z",
+        "NoOfStatusComments": 3,
+        "StatusComments": [
+            {
+                "Actor": "Wendy Terry",
+                "Timestamp": "2018-04-20T14:24:39.085941Z",
+                "Comment": {
+                    "Locale": "en-US",
+                    "Text": "Mission accomplished!"
+                }
+            },
+            {
+                "Actor": "Gavin Mackenzie",
+                "Timestamp": "2018-04-20T14:24:39.085941Z",
+                "Comment": {
+                    "Locale": "en-US",
+                    "Text": "I think clients would love this."
+                }
+            },
+            {
+                "Actor": "Phil Taylor",
+                "Timestamp": "2018-04-20T14:24:39.085941Z",
+                "Comment": {
+                    "Locale": "en-US",
+                    "Text": "And justice for all."
+                }
+            }
+        ]
+    },
+    "value-schema": {
+        "type": "object",
+        "properties": {
+            "ID": {
+                "type": "string"
+            },
+            "AssetID": {
+                "type": "string"
+            },
+            "StartTime": {
+                "type": "string"
+            },
+            "NoOfStatusComments": {
+                "type": "number"
+            },
+            "StatusComments": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "Actor": {
+                            "type": "string"
+                        },
+                        "Timestamp": {
+                            "type": "string"
+                        },
+                        "Comment": {
+                            "type": "object",
+                            "properties": {
+                                "Locale": {
+                                    "type": "string"
+                                },
+                                "Text": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "minItems": 3,
+                "maxItems": 3
+            }
+        }
+    },
+    "status": "Good",
+    "deadBand": "None",
+    "minimumSamplingInterval": 0,
+    "edges": []
+}
+```
+
+### Write a new value for a Variable Node
+
+Update the value of a Variable Node:
+
+`POST http://{{base_url}}/api/data-sets/3/nodes/2-Demo.Static.Scalar.WorkOrder { "value": <YOUR-NEW-VALUE> }`
+
+You can make a request with:
+
+```
+curl -X POST \
+  http://{YOUR-URL}/api/data-sets/3/nodes/2-Demo.Static.Scalar.WorkOrder \
+  -H 'Authorization: Bearer {YOUR-AUTHENTICATION-TOKEN} \
+  -d '{
+  "value": {
+        "ID": "9240890a-6ea8-41fc-8e84-f47edd3e3595",
+        "AssetID": "123-X-Y-Z",
+        "StartTime": "2018-04-20T14:24:39.085941Z",
+        "NoOfStatusComments": 2,
+        "StatusComments": [
+            {
+                "Actor": "Dylan Thomas",
+                "Timestamp": "2018-04-20T14:24:39.085941Z",
+                "Comment": {
+                    "Locale": "en-US",
+                    "Text": "Do not go gentle into that good night"
+                }
+            },
+            {
+                "Actor": "William Shakespeare",
+                "Timestamp": "2018-04-20T14:24:39.085941Z",
+                "Comment": {
+                    "Locale": "en-US",
+                    "Text": "There is nothing either good or bad, but thinking makes it so."
+                }
+            }
+        ]
+    }
+}'
+```
+
+It worth noting how a client not compliant with the OPC UA specification is able to write new well-formed values
+with the aid of JSON Schemas.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+1. AutoMapper
+2. BlazorLocalStorage
+3. 
 
 ### Installation
 
@@ -133,87 +394,26 @@ See the [open issues](https://github.com/othneildrew/Best-README-Template/issues
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- [Integration of OPC UA into a web-based platform to enhance interoperability (ISIE 2017)](https://ieeexplore.ieee.org/document/8001417/)
+- [OPC UA integration into the web (IECON 2017)](https://ieeexplore.ieee.org/document/8216590/)
+- [A web-based platform for OPC UA integration in IIoT environment (ETFA 2017)](https://ieeexplore.ieee.org/document/8247713/)
+- [Integrating OPC UA with web technologies to enhance interoperability (Computer Standards & Interfaces 2018 - Elsevier)](https://doi.org/10.1016/j.csi.2018.04.004)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+top">back to top</a>)</p>
 
 
 
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+Nguyen Xuan Hung - hung.nguyenxuan1501@gmail.com
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
-
+Project Link: [[https://github.com/hungn15012000/](https://github.com/hungn15012000/))
+](https://github.com/hungn15012000/)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
 
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
-
-* [Choose an Open Source License](https://choosealicense.com)
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
-* [Malven's Grid Cheatsheet](https://grid.malven.co/)
-* [Img Shields](https://shields.io)
-* [GitHub Pages](https://pages.github.com)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
-[contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
-[stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/othneildrew
-[product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
